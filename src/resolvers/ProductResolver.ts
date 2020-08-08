@@ -10,6 +10,15 @@ class ProductInput {
   quantity!: number
 }
 
+@InputType()
+class ProductUpdateInput {
+  @Field(() => String, { nullable: true })
+  name?: string
+  
+  @Field(() => Int, { nullable: true})
+  quantity?: number
+}
+
 @Resolver()
 export class ProductResolver {
 
@@ -22,6 +31,21 @@ export class ProductResolver {
     // await Product.insert({ name, quantity })
     const newProduct = Product.create(variables)
     return await newProduct.save()
+  }
+
+  @Mutation(() => Boolean)
+  async updateProduct (
+    @Arg('id', () => Int) id: number,
+    @Arg('fields', () => ProductUpdateInput) fields: ProductUpdateInput
+  ) {
+    await Product.update({ id }, fields)
+    return true
+  }
+
+  @Mutation(() => Boolean)
+  async deleteProduct (@Arg('id', () => Int) id: number) {
+    await Product.delete(id)
+    return true
   }
 
   @Query(() => [Product])
